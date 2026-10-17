@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Periodic Trends: Color-Coded Periodic Table</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--ink:#1c2a3f;--mute:#5a6a80;--line:#cfd7e2;--cell:#eef2f7;--ok:#146c3a;--okbg:#e3f5ea;--bad:#9b1c1c;--badbg:#fdeaea;--a:#1d4ed8;--b:#b91c1c;--c:#15803d;--d:#7e22ce;--focus:#f59e0b}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--card:#1a2433;--ink:#e6edf6;--mute:#9fb0c6;--line:#34455c;--cell:#243247;--ok:#7be0a4;--okbg:#17382a;--bad:#ff9d9d;--badbg:#44201f;--a:#7aa2ff;--b:#ff8f8f;--c:#6fdc98;--d:#c79bff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.25}
+h1{font-size:1.8rem;margin:.2em 0}
+h2{font-size:1.35rem;margin:1.6em 0 .4em}
+section,.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.sub{color:var(--mute);margin:0}
+details{border:1px solid var(--line);border-radius:8px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;padding:10px 14px;font-weight:600}
+details>div{padding:0 14px 12px}
+.key{border-left:4px solid var(--a);padding:4px 10px;background:var(--cell);border-radius:0 6px 6px 0;margin:8px 0}
+button,select,textarea{font:inherit;color:var(--ink)}
+button{background:var(--cell);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button.primary{background:var(--a);color:#fff;border-color:var(--a)}
+@media (prefers-color-scheme:dark){button.primary{color:#0b1220}}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+select,textarea{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px;width:100%}
+textarea{min-height:80px}
+.wrap{overflow-x:auto;padding-bottom:6px}
+.stage{display:grid;grid-template-columns:140px 1fr 140px;grid-template-areas:". top ." "left tbl right" ". bottom .";gap:8px;min-width:920px;align-items:stretch}
+.slot{display:flex;flex-direction:column;gap:6px;padding:6px;border:2px dashed var(--line);border-radius:8px;font-size:.85rem}
+.slot.ok{border:2px solid var(--ok);background:var(--okbg)}
+.slot.bad{border:2px solid var(--bad);background:var(--badbg)}
+#s-top{grid-area:top}#s-bottom{grid-area:bottom}#s-left{grid-area:left}#s-right{grid-area:right}
+.arrow{display:flex;align-items:center;justify-content:center;flex:1;min-height:26px;color:var(--mute)}
+.v .arrow{flex-direction:column}
+.arrow .ln{flex:1;background:currentColor}
+.h .arrow .ln{height:5px}.v .arrow .ln{width:5px}
+.arrow svg{width:18px;height:18px;flex:none}
+.msg{min-height:1.2em;font-size:.82rem}
+.ptable{grid-area:tbl;display:grid;grid-template-columns:repeat(18,1fr);gap:2px}
+.el{background:var(--cell);border:1px solid var(--line);border-radius:3px;font-size:.78rem;text-align:center;padding:3px 0;cursor:pointer;min-height:34px}
+.el small{display:block;font-size:.6rem;color:var(--mute);line-height:1}
+.el.sel{outline:3px solid var(--focus)}
+.info{margin:8px 0;padding:8px 12px;background:var(--cell);border-radius:8px;min-height:2.4em}
+.banner{margin-top:10px;padding:8px 12px;border-radius:8px;font-weight:600;display:none}
+.q{margin:14px 0;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.q label{display:block;padding:3px 0}
+.fb{font-size:.9rem;margin-top:4px}
+.good{color:var(--ok)}.nope{color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.toolbar{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;margin:10px 0}
+.modes label{display:inline-block;margin-right:16px}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.sw{display:flex;align-items:center;gap:6px;padding:4px 10px}
+.sw.on{outline:3px solid var(--focus);font-weight:600}
+.chip{width:16px;height:16px;border-radius:4px;border:1px solid #0006;display:inline-block}
+.el{user-select:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.el.painted{color:#0b1220}.el.painted small{color:#33415c}
+.el.wrong{outline:3px solid var(--bad);outline-offset:-1px}
+.colormsg{font-weight:600;margin-top:6px;min-height:1.2em}
+.note{font-size:.85rem;color:var(--mute);margin:4px 0 0}
+@media print{body{background:#fff;color:#000}.row button,.noprint{display:none}details{border:1px solid #999}details>div{display:block}.stage{min-width:0}}
+</style>
+</head>
+<body>
+<main>
+<h1>Your Color-Coded Periodic Table</h1>
+<p class="sub">TEKS C.5C &middot; Periodic trends: electronegativity, ionization energy, atomic radius</p>
+
+<section>
+<h2 style="margin-top:0">Background: the "upper" trends</h2>
+<p>Open each term and read it. The bold line is the idea to remember.</p>
+
+<details open><summary>Effective nuclear charge (Zeff)</summary><div>
+<p>Effective nuclear charge is the net positive pull from the nucleus's protons on the electrons. Inner (core) electrons shield the valence electrons from feeling the full pull of the protons.</p>
+<p>Zeff increases across a period because protons are added. Zeff is reduced down a family because additional energy levels put the valence electrons farther from the nucleus.</p>
+<p class="key"><b>Across a period: Zeff goes up. Down a family: the pull felt by valence electrons goes down.</b></p></div></details>
+
+<details><summary>Shielding</summary><div>
+<p>Shielding occurs when the innermost (core) electrons block valence electrons from the full pull of the protons in the nucleus.</p>
+<p class="key"><b>More energy levels means more core electrons and more shielding.</b></p></div></details>
+
+<details><summary>Electron-electron repulsion</summary><div>
+<p>Electrons are all negatively charged, so they push away from each other. This repulsion makes the electron cloud expand. The effect can influence electronegativity and ionization energy, particularly in p-block elements.</p>
+<p class="key"><b>Repulsion between electrons spreads the cloud out.</b></p></div></details>
+
+<details><summary>Atomic radius</summary><div>
+<p>Atomic radius is the distance from the nucleus to the edge of the electron cloud. It is measured as half the distance between two identical, bonded nuclei.</p>
+<p>Across a period, radius increases from right to left: Zeff decreases while shielding stays the same, so fewer protons pull less strongly on the same energy levels and the elements on the left are larger. Down a family, radius increases because of added energy levels.</p>
+<p class="key"><b>Radius increases toward the left and toward the bottom of the table.</b></p></div></details>
+
+<details><summary>Atomic mass</summary><div>
+<p>Atomic mass increases from left to right across a period because of increasing numbers of protons (atomic number) and, typically, neutrons. It also increases down a family for the same reason.</p>
+<p class="key"><b>Atomic mass generally increases toward the right and toward the bottom.</b></p></div></details>
+
+<details><summary>Ionization energy</summary><div>
+<p>Ionization energy is the energy required to remove the highest-energy electron from a neutral atom in the gas state.</p>
+<p>It increases across a period (left to right) because greater Zeff pulls the cloud closer, so more energy is needed to remove an electron. It increases from the bottom of a family to the top because there are fewer energy levels between the valence electrons and the nucleus.</p>
+<p class="key"><b>Ionization energy increases toward the right and toward the top.</b></p></div></details>
+
+<details><summary>Electronegativity</summary><div>
+<p>Electronegativity is the ability of an atom to attract electrons in a chemical bond. It increases across a period and from the bottom of a family to the top.</p>
+<p>On the left (metals), valence shells are less than half full, so atoms tend to lose electrons and have low electronegativity. On the right (nonmetals), valence shells are more than half full, so atoms tend to gain electrons and have high electronegativity. Going up a family, fewer energy levels and less shielding mean stronger nuclear attraction during bonding.</p>
+<p>Fluorine is the most electronegative element. Francium is the least. Noble gases are not reported to have electronegativity because they are often unstable.</p>
+<p class="key"><b>Electronegativity increases toward the right and toward the top.</b></p></div></details>
+</section>
+
+<section>
+<h2 style="margin-top:0">Directions</h2>
+<ol>
+<li><b>Color-code the table.</b> Choose how to sort the elements, pick a color, then click an element to paint it. With a mouse you can click and drag to paint several at once. Press <b>Check colors</b> when you finish.</li>
+<li><b>Add the trend arrows.</b> Each arrow around the table needs a <b>label</b> and a <b>direction</b>. Pick a label from the menu, then press <b>Flip direction</b> until the arrowhead points the way the trend <i>increases</i>.</li>
+</ol>
+<div class="toolbar" id="toolbar">
+ <div class="modes" role="radiogroup" aria-label="Sort the elements by">
+  <label><input type="radio" name="mode" value="type" checked> Element types (metal / metalloid / nonmetal)</label>
+  <label><input type="radio" name="mode" value="family"> Families</label>
+ </div>
+ <div class="palette" id="palette"></div>
+ <div class="row noprint" style="margin-top:4px"><button class="primary" id="checkColors">Check colors</button><button id="revealColors">Show answer colors</button><button id="clearColors">Clear colors</button></div>
+ <div class="colormsg" id="colormsg" role="status" aria-live="polite"></div>
+ <p class="note">A few border cases (hydrogen, polonium, astatine, and some very heavy elements) are classified differently by different charts. The check accepts either answer for those.</p>
+</div>
+<p class="sub">Tap any element to see its period and group.</p>
+<div class="wrap"><div class="stage" id="stage"></div></div>
+<div class="info" id="info" aria-live="polite">Tap an element to see its details.</div>
+<div class="row noprint"><button class="primary" id="check">Check my arrows</button><button id="reset">Reset</button><button onclick="window.print()">Print</button></div>
+<div class="banner" id="banner" role="status"></div>
+</section>
+
+<section>
+<h2 style="margin-top:0">Trend detective</h2>
+<p>Use your arrows to answer. You get feedback after each choice.</p>
+<div id="quiz"></div>
+</section>
+
+<section>
+<h2 style="margin-top:0">Explain it</h2>
+<p>Answers on this page are not saved. Write on paper or copy them somewhere before you leave.</p>
+<p><b>1.</b> Why does atomic radius decrease from left to right across a period?</p><textarea></textarea>
+<p><b>2.</b> Why does ionization energy decrease as you go down a family?</p><textarea></textarea>
+<p><b>3.</b> Fluorine is the most electronegative element. Use the position of fluorine and what you know about Zeff and shielding to explain why.</p><textarea></textarea>
+</section>
+</main>
+
+<script>
+const SYM="H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og".split(" ");
+function pos(n){
+  if(n===1)return[1,1];if(n===2)return[1,18];
+  if(n<=4)return[2,n-2];if(n<=10)return[2,n+8];
+  if(n<=12)return[3,n-10];if(n<=18)return[3,n];
+  if(n<=36)return[4,n-18];if(n<=54)return[5,n-36];
+  if(n<=56)return[6,n-54];if(n<=71)return[9,n-54];
+  if(n<=86)return[6,n-68];if(n<=88)return[7,n-86];
+  if(n<=103)return[10,n-86];return[7,n-100];
+}
+// Labels: dir = direction the trend increases; axis = h (across a period) or v (along a family)
+const LABELS={
+ A:{text:"Atomic radius increases",axis:"h",dir:"left",color:"var(--a)",why:"Radius is larger on the left because Zeff is weaker there while shielding stays the same."},
+ B:{text:"Electronegativity / ionization energy / atomic mass increases",axis:"h",dir:"right",color:"var(--b)",why:"These increase left to right across a period."},
+ C:{text:"Electronegativity / ionization energy increases",axis:"v",dir:"up",color:"var(--c)",why:"These increase toward the top of a family (fewer energy levels, less shielding)."},
+ D:{text:"Atomic radius / atomic mass increases",axis:"v",dir:"down",color:"var(--d)",why:"These increase toward the bottom of a family (more energy levels, more protons and neutrons)."}
+};
+
+// ---- Color coding data ----
+const FAM={
+ alkali:{name:"Alkali metals",color:"#f28b82"},alkearth:{name:"Alkaline earth metals",color:"#fbbc6a"},
+ trans:{name:"Transition metals",color:"#f7e26b"},lanth:{name:"Lanthanides",color:"#b7e07a"},
+ actin:{name:"Actinides",color:"#6fd3a5"},posttrans:{name:"Post-transition metals",color:"#6ccbd9"},
+ metalloid:{name:"Metalloids",color:"#8fb4f5"},nonmetal:{name:"Other nonmetals",color:"#c3a6f0"},
+ halogen:{name:"Halogens",color:"#f4a6d6"},noble:{name:"Noble gases",color:"#d0d5dc"}};
+const TYPE={metal:{name:"Metals",color:"#f7c36a"},metalloid:{name:"Metalloids",color:"#7fd1b9"},nonmetal:{name:"Nonmetals",color:"#a9b8f5"}};
+const LISTS={alkali:[3,11,19,37,55,87],alkearth:[4,12,20,38,56,88],metalloid:[5,14,32,33,51,52],
+ halogen:[9,17,35,53,85,117],noble:[2,10,18,36,54,86,118],nonmetal:[1,6,7,8,15,16,34],
+ posttrans:[13,31,49,50,81,82,83,84,113,114,115,116]};
+function famOf(n){for(const k in LISTS)if(LISTS[k].includes(n))return k;if(n>=57&&n<=71)return"lanth";if(n>=89&&n<=103)return"actin";return"trans";}
+const TYPE_OF={alkali:"metal",alkearth:"metal",trans:"metal",lanth:"metal",actin:"metal",posttrans:"metal",metalloid:"metalloid",nonmetal:"nonmetal",halogen:"nonmetal",noble:"nonmetal"};
+const ALT_FAM={1:["alkali"],84:["metalloid"],85:["metalloid"],71:["trans"],103:["trans"]};
+const ALT_TYPE={84:["metalloid"],85:["metalloid"],117:["metalloid"],118:["metal"]};
+function correctSet(n,m){return m==="family"?[famOf(n)].concat(ALT_FAM[n]||[]):[TYPE_OF[famOf(n)]].concat(ALT_TYPE[n]||[]);}
+const paint={type:{},family:{}};let mode="type",brush="metal",painting=false;
+const cats=()=>mode==="family"?FAM:TYPE;
+function buildPalette(){
+  const p=document.getElementById("palette"),c=cats();p.innerHTML="";
+  if(!c[brush]&&brush!=="_erase")brush=Object.keys(c)[0];
+  Object.keys(c).concat(["_erase"]).forEach(k=>{
+    const b=document.createElement("button");b.type="button";b.className="sw"+(k===brush?" on":"");
+    b.innerHTML='<span class="chip" style="background:'+(k==="_erase"?"transparent":c[k].color)+'"></span>'+(k==="_erase"?"Eraser":c[k].name);
+    b.setAttribute("aria-pressed",k===brush);b.onclick=()=>{brush=k;buildPalette();};p.appendChild(b);
+  });
+}
+function styleCell(b){
+  const k=paint[mode][+b.dataset.n];b.classList.remove("wrong");
+  b.style.background=k?cats()[k].color:"";b.classList.toggle("painted",!!k);
+}
+function applyPaint(){document.querySelectorAll(".el").forEach(styleCell);}
+function paintCell(b){
+  const n=+b.dataset.n;if(brush==="_erase")delete paint[mode][n];else paint[mode][n]=brush;styleCell(b);
+}
+function checkColors(){
+  let ok=0,blank=0,bad=0;const miss={};
+  document.querySelectorAll(".el").forEach(b=>{
+    const n=+b.dataset.n,k=paint[mode][n];b.classList.remove("wrong");
+    if(!k){blank++;return;}
+    const cs=correctSet(n,mode);
+    if(cs.includes(k))ok++;else{bad++;b.classList.add("wrong");miss[cs[0]]=(miss[cs[0]]||0)+1;}
+  });
+  const top=Object.keys(miss).sort((a,b)=>miss[b]-miss[a]).slice(0,2).map(k=>cats()[k].name);
+  document.getElementById("colormsg").textContent=ok===118?"All 118 elements are colored correctly.":
+    ok+" of 118 correct. "+blank+" not colored yet. "+bad+" outlined in red need another look."+(top.length?" Most misses are in: "+top.join(" and ")+".":"");
+}
+function revealColors(){
+  document.querySelectorAll(".el").forEach(b=>{paint[mode][+b.dataset.n]=correctSet(+b.dataset.n,mode)[0];});
+  applyPaint();document.getElementById("colormsg").textContent="Answer colors filled in. Compare them with your own table.";
+}
+document.addEventListener("mouseup",()=>painting=false);
+document.getElementById("checkColors").onclick=checkColors;
+document.getElementById("revealColors").onclick=revealColors;
+document.getElementById("clearColors").onclick=()=>{paint[mode]={};applyPaint();document.getElementById("colormsg").textContent="";};
+document.querySelectorAll('input[name="mode"]').forEach(r=>r.onchange=()=>{mode=r.value;brush=Object.keys(cats())[0];buildPalette();applyPaint();document.getElementById("colormsg").textContent="";});
+const SLOTS=[{id:"top",axis:"h"},{id:"bottom",axis:"h"},{id:"left",axis:"v"},{id:"right",axis:"v"}];
+const state={};
+const head=(d)=>{const r={right:0,down:90,left:180,up:270}[d];return `<svg viewBox="0 0 20 20" aria-hidden="true" style="transform:rotate(${r}deg)"><polygon points="2,2 18,10 2,18" fill="currentColor"/></svg>`};
+function dirs(axis){return axis==="h"?["right","left"]:["down","up"]}
+function reset(){SLOTS.forEach(s=>state[s.id]={label:"",dir:dirs(s.axis)[0]});}
+function arrowHTML(s){
+  const st=state[s.id],col=st.label?LABELS[st.label].color:"var(--mute)";
+  const first=(st.dir==="left"||st.dir==="up");
+  return `<div class="arrow" style="color:${col}">${first?head(st.dir):""}<div class="ln"></div>${first?"":head(st.dir)}</div>`;
+}
+function render(){
+  const stage=document.getElementById("stage");
+  const slotsHTML=SLOTS.map(s=>`<div class="slot ${s.axis}" id="s-${s.id}">
+    <label for="sel-${s.id}">Label for ${s.id} arrow</label>
+    <select id="sel-${s.id}" data-id="${s.id}"><option value="">Choose a label&hellip;</option>${Object.keys(LABELS).map(k=>`<option value="${k}" ${state[s.id].label===k?"selected":""}>${LABELS[k].text}</option>`).join("")}</select>
+    <button data-flip="${s.id}">Flip direction</button>
+    ${arrowHTML(s)}<div class="msg" id="m-${s.id}"></div></div>`).join("");
+  stage.innerHTML=slotsHTML+'<div class="ptable" id="pt"></div>';
+  const pt=document.getElementById("pt");
+  SYM.forEach((sy,i)=>{const n=i+1,[r,c]=pos(n);const b=document.createElement("button");b.className="el";b.style.gridRow=r;b.style.gridColumn=c;
+    b.dataset.n=n;b.innerHTML=`<small>${n}</small>${sy}`;b.setAttribute("aria-label","Element "+sy+", atomic number "+n);
+    b.onmousedown=()=>{painting=true;paintCell(b);showEl(n,b);};
+    b.onmouseenter=e=>{if(painting&&e.buttons===1)paintCell(b);};
+    b.onclick=e=>{if(e.detail===0){paintCell(b);showEl(n,b);}};
+    pt.appendChild(b);});
+  applyPaint();
+  // blank spacer row so lanthanides/actinides sit below the main table
+  const sp=document.createElement("div");sp.style.gridRow=8;sp.style.gridColumn="1 / span 18";sp.style.height="8px";pt.appendChild(sp);
+  stage.querySelectorAll("select").forEach(s=>s.onchange=e=>{state[e.target.dataset.id].label=e.target.value;render();});
+  stage.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>{const s=SLOTS.find(x=>x.id===b.dataset.flip),st=state[s.id],d=dirs(s.axis);st.dir=st.dir===d[0]?d[1]:d[0];render();});
+}
+function showEl(n,btn){
+  document.querySelectorAll(".el.sel").forEach(e=>e.classList.remove("sel"));btn.classList.add("sel");
+  let per,grp;
+  if(n>=57&&n<=71){per=6;grp="lanthanide series (f-block)";}
+  else if(n>=89&&n<=103){per=7;grp="actinide series (f-block)";}
+  else{const [r,c]=pos(n);per=r;grp="group "+c;}
+  const noble=[2,10,18,36,54,86,118].includes(n)?" Noble gas: electronegativity is not reported.":"";
+  document.getElementById("info").textContent=SYM[n-1]+" \u2014 atomic number "+n+", period "+per+", "+grp+"."+noble;
+}
+function check(){
+  let good=0;const used={};
+  SLOTS.forEach(s=>{
+    const st=state[s.id],box=document.getElementById("s-"+s.id),m=document.getElementById("m-"+s.id);
+    let msg="",ok=false;
+    if(!st.label)msg="Choose a label for this arrow.";
+    else{const L=LABELS[st.label];
+      if(L.axis!==s.axis)msg=s.axis==="h"?"This arrow runs across a period (side to side). This label is about a family (up and down).":"This arrow runs along a family (up and down). This label is about a period (side to side).";
+      else if(used[st.label])msg="Another arrow already uses this label. The two arrows on the same axis need different labels.";
+      else if(st.dir!==L.dir)msg="Right label for this axis, wrong direction. "+L.why;
+      else{ok=true;msg="Correct. "+L.why;used[st.label]=1;}}
+    box.className="slot "+s.axis+(ok?" ok":" bad");m.textContent=msg;if(ok)good++;
+  });
+  const b=document.getElementById("banner");b.style.display="block";
+  b.style.background=good===4?"var(--okbg)":"var(--cell)";b.style.color=good===4?"var(--ok)":"var(--ink)";
+  b.textContent=good===4?"All four arrows are correct.":good+" of 4 arrows correct. Read the notes on each arrow and adjust.";
+}
+document.getElementById("check").onclick=check;
+document.getElementById("reset").onclick=()=>{reset();document.getElementById("banner").style.display="none";render();};
+
+const Q=[
+ {q:"Which element has the larger atomic radius: sodium (Na) or chlorine (Cl)?",o:["Na","Cl"],a:0,e:"Both are in period 3. Radius increases toward the left, so Na is larger."},
+ {q:"Which element has the largest atomic radius?",o:["Li","Na","K","Rb"],a:3,e:"Same family. Radius increases down a family because of added energy levels."},
+ {q:"Which has the higher ionization energy: magnesium (Mg) or barium (Ba)?",o:["Mg","Ba"],a:0,e:"Same family. Ionization energy increases toward the top: fewer energy levels, less shielding."},
+ {q:"Which has the higher ionization energy: silicon (Si) or chlorine (Cl)?",o:["Si","Cl"],a:1,e:"Both are in period 3. Ionization energy increases left to right as Zeff increases."},
+ {q:"Which is more electronegative: oxygen (O) or sulfur (S)?",o:["O","S"],a:0,e:"Same family. Electronegativity increases toward the top."},
+ {q:"Which element is the least electronegative?",o:["Fr","Cs","K","Na"],a:0,e:"Francium is at the bottom left, the opposite corner from fluorine (the most electronegative)."},
+ {q:"Why does ionization energy increase across a period?",o:["Zeff increases, so the nucleus holds electrons more tightly","Shielding increases a lot","Atoms gain more energy levels"],a:0,e:"Protons are added while shielding stays about the same, so the pull on valence electrons grows."}
+];
+const quiz=document.getElementById("quiz");
+Q.forEach((it,i)=>{
+  const d=document.createElement("div");d.className="q";
+  d.innerHTML=`<div><b>${i+1}.</b> ${it.q}</div>`+it.o.map((t,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${t}</label>`).join("")+`<div class="fb" id="fb${i}" aria-live="polite"></div>`;
+  d.querySelectorAll("input").forEach(r=>r.onchange=()=>{const f=document.getElementById("fb"+i),right=+r.value===it.a;f.className="fb "+(right?"good":"nope");f.textContent=(right?"Correct. ":"Not quite. ")+it.e;});
+  quiz.appendChild(d);
+});
+reset();buildPalette();render();
+</script>
+</body>
+</html>
